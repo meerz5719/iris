@@ -1,26 +1,25 @@
-import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
+import streamlit as st
+import numpy as np
 from sklearn.datasets import load_iris
-from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score
 
-# Load dataset
+st.title("🌸 Iris Flower Species Prediction")
+
 iris = load_iris()
-df = pd.DataFrame(iris.data, columns=iris.feature_names)
-df['species'] = iris.target
-df['species'] = df['species'].map(dict(enumerate(iris.target_names)))
-
-# Train-test split
-X = df[iris.feature_names]
-y = df['species']
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-# Train model
+X = iris.data
+y = iris.target
 model = RandomForestClassifier()
-model.fit(X_train, y_train)
+model.fit(X, y)
 
-# Evaluate
-y_pred = model.predict(X_test)
-print("Accuracy:", accuracy_score(y_test, y_pred))
+st.sidebar.header("Input Features")
+sepal_length = st.sidebar.slider('Sepal length', float(X[:,0].min()), float(X[:,0].max()), float(X[:,0].mean()))
+sepal_width  = st.sidebar.slider('Sepal width', float(X[:,1].min()), float(X[:,1].max()), float(X[:,1].mean()))
+petal_length = st.sidebar.slider('Petal length', float(X[:,2].min()), float(X[:,2].max()), float(X[:,2].mean()))
+petal_width  = st.sidebar.slider('Petal width', float(X[:,3].min()), float(X[:,3].max()), float(X[:,3].mean()))
+
+input_data = np.array([[sepal_length, sepal_width, petal_length, petal_width]])
+prediction = model.predict(input_data)[0]
+species = iris.target_names[prediction]
+
+st.write("### Predicted Species:")
+st.success(f"🌼 {species.capitalize()}")
